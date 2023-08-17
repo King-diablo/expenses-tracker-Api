@@ -1,7 +1,7 @@
 const express = require("express");
 const transactionRoute = express.Router();
 
-const { CreateTransaction, GetTransactions } = require("../controller/UserController");
+const { CreateTransaction, GetTransactions } = require("../controller/TransactionController");
 
 const { Authorzie } = require("../middleware/Validation");
 

@@ -1,6 +1,5 @@
 require("dotenv").config();
 const express = require("express");
-const bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
 
 const { CreateUser, UpdateInfo, LogIn } = require("../controller/UserController");
@@ -89,3 +88,4 @@ module.exports = {
 
 ///TODO Create a logout system
 ///TODO Create a delete endpoint to delete a user
+///TODO Add validation to the updateInfo endpoint
