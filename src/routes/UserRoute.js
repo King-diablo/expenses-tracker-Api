@@ -45,15 +45,21 @@ userRoute.post("/create", validateInput, async (req, res) => {
 userRoute.post("/login", validateInput, async (req, res) => {
     const { email, password } = req.body;
 
+    console.log(req.headers);
+
     const response = await LogIn(email, password);
 
     const userId = response?.user?.userId;
 
-    console.log(userId);
-
     var token = jwt.sign(Payload(userId, email), secret, { expiresIn: "1h" });
 
-    res.status(response.statusCode).json({ response, token });
+    const newResponse = {
+        statusCode: response.statusCode,
+        status: response.status,
+        message: response.message,
+    }
+
+    res.status(response.statusCode).json({ newResponse, token });
 })
 
 userRoute.post("/update", Authorzie, validateUpdatedInput, async (req, res) => {
