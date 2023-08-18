@@ -11,16 +11,20 @@ transactionRoute.post("/credit", Authorzie, async (req, res) => {
 
     const response = await CreateTransaction(userId, amount, description, "credit");
 
-    res.status(200).json({ response });
+    res.status(response.statusCode).json({ response });
 });
 
 transactionRoute.post("/debit", Authorzie, async (req, res) => {
     const { amount, description } = req.body;
     const { userId } = req.user;
 
+    console.log(req.user);
+
     const response = await CreateTransaction(userId, amount, description, "debit");
 
-    res.status(200).json({ response });
+    console.log(response);
+
+    res.status(response.statusCode).json({ response });
 });
 
 

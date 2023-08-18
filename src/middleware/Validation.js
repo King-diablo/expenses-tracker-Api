@@ -26,6 +26,32 @@ async function validateInput(req, res, next) {
     }
 }
 
+async function validateUpdatedInput(req, res, next) {
+    const { name, Gender, picture } = req.body;
+
+    const inputSchema = Joi.object({
+        name: Joi.string()
+            .min(4)
+            .message("a name of atleast 4 character long is needed"),
+
+        Gender: Joi.string()
+            .min(1)
+            .message("Gender is required"),
+
+        picture: Joi.string()
+            .message("A url of an imagae is needed")
+    });
+
+    try {
+        const value = await inputSchema.validateAsync({ email, password });
+        next();
+        return;
+
+    } catch (error) {
+        return res.status(400).json({ error });
+    }
+}
+
 async function Authorzie(req, res, next) {
 
     const token = req.headers.authorization;
@@ -44,9 +70,12 @@ async function Authorzie(req, res, next) {
             message: "invalid token"
         });
     }
+
+    console.log(req.headers);
 }
 
 module.exports = {
     validateInput,
+    validateUpdatedInput,
     Authorzie
 }

@@ -1,4 +1,6 @@
 const { FindUser } = require("../controller/UserController");
+const { v4: uuidv4 } = require('uuid');
+const { User } = require("../model/UserModel");
 
 async function CreateTransaction(userId, amount, description, transactionType) {
     const newAmount = parseFloat(amount);
@@ -14,6 +16,13 @@ async function CreateTransaction(userId, amount, description, transactionType) {
 
     const user = await FindUser(userId);
 
+    if (user.status === "error") {
+        return {
+            statusCode: user.statusCode,
+            status: "error",
+            message: user.message,
+        };
+    }
     let Transactions = user.user?.Transactions;
     let balance = user.user.balance;
 
@@ -33,16 +42,34 @@ async function CreateTransaction(userId, amount, description, transactionType) {
         balance -= parseFloat(newAmount);
     }
 
-    const updatedUser = await User.updateOne({ userId }, { Transactions: Transactions, balance: balance });
+    try {
+        const updatedUser = await User.updateOne({ userId }, { Transactions: Transactions, balance: balance });
+        return {
+            statusCode: 201,
+            status: "success",
+            message: `${transactionType} alert created`,
+            balance
+        };
 
-    return {
-        message: `${transactionType} alert created`,
-        balance
-    };
+    } catch (error) {
+        return {
+            statusCode: 400,
+            status: "error",
+            message: error.message,
+        };
+    }
 }
 
 async function GetTransactions(userId, transactionType) {
     const user = await FindUser(userId);
+
+    if (user.status === "error") {
+        return {
+            statusCode: user.statusCode,
+            status: "error",
+            message: user.message,
+        };
+    }
 
     const transactions = user.user?.Transactions;
     const balance = user?.user?.balance;
@@ -53,6 +80,8 @@ async function GetTransactions(userId, transactionType) {
 
     if (transactions === undefined) {
         return {
+            statusCode: 200,
+            status: "success",
             message: "no transactions",
         }
     }

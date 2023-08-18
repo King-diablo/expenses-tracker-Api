@@ -2,8 +2,8 @@ require("dotenv").config();
 const express = require("express");
 var jwt = require('jsonwebtoken');
 
-const { CreateUser, UpdateInfo, LogIn } = require("../controller/UserController");
-const { Authorzie, validateInput } = require("../middleware/Validation");
+const { CreateUser, UpdateInfo, LogIn, DeleteUser } = require("../controller/UserController");
+const { Authorzie, validateInput, validateUpdatedInput } = require("../middleware/Validation");
 const { Payload } = require("../helper/Helpers");
 const { transactionRoute } = require("./TransactionRoute");
 
@@ -14,13 +14,13 @@ const secret = process.env.SECRET_KEY;
 userRoute.post("/create", validateInput, async (req, res) => {
     const { email, password } = req.body;
     if (email === undefined || email === "") {
-        res.status(403).json({
+        res.status(400).json({
             message: "Invlid email",
         });
     }
 
     if (password === undefined || password === "") {
-        res.status(403).json({
+        res.status(400).json({
             message: "Invlid password",
         });
     }
@@ -28,7 +28,7 @@ userRoute.post("/create", validateInput, async (req, res) => {
     const response = await CreateUser(email, password);
 
     if (response.error) {
-        res.status(400).json({
+        res.status(response.statusCode).json({
             message: `${response.error.keyValue.email} already exist`
         })
         return;
@@ -36,9 +36,9 @@ userRoute.post("/create", validateInput, async (req, res) => {
 
     const userId = response?.result?.userId;
 
-    var token = jwt.sign(Payload(userId, email), secret);
+    var token = jwt.sign(Payload(userId, email), secret, { expiresIn: "1h" });
 
-    res.status(200).json({ response, token });
+    res.status(response.statusCode).json({ response, token });
 
 });
 
@@ -47,14 +47,16 @@ userRoute.post("/login", validateInput, async (req, res) => {
 
     const response = await LogIn(email, password);
 
-    const userId = response?.result?.userId;
+    const userId = response?.user?.userId;
 
-    var token = jwt.sign(Payload(userId, email), secret);
+    console.log(userId);
 
-    res.status(200).json({ response, token });
+    var token = jwt.sign(Payload(userId, email), secret, { expiresIn: "1h" });
+
+    res.status(response.statusCode).json({ response, token });
 })
 
-userRoute.post("/update", Authorzie, async (req, res) => {
+userRoute.post("/update", Authorzie, validateUpdatedInput, async (req, res) => {
     const { name, Gender, picture } = req.body;
     const { userId } = req.user;
 
@@ -66,17 +68,17 @@ userRoute.post("/update", Authorzie, async (req, res) => {
 
     const result = await UpdateInfo(userId, info);
 
-    res.status(200).json({
+    res.status(result.statusCode).json({
         result
     })
 })
 
-userRoute.post("/logout", Authorzie, async (req, res) => {
+userRoute.delete("/delete", Authorzie, async (req, res) => {
+    const user = req.user;
 
-});
+    const response = await DeleteUser(user.userId);
 
-userRoute.delete("/delete", async (req, res) => {
-
+    res.status(response.statusCode).json({ response });
 })
 
 userRoute.use("/transaction", transactionRoute);
@@ -85,7 +87,3 @@ userRoute.use("/transaction", transactionRoute);
 module.exports = {
     userRoute,
 }
-
-///TODO Create a logout system
-///TODO Create a delete endpoint to delete a user
-///TODO Add validation to the updateInfo endpoint

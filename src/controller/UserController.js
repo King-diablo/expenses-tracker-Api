@@ -19,11 +19,17 @@ async function CreateUser(email, password) {
     try {
         const result = await newUser.save();
         return {
+            statusCode: 201,
+            status: "created",
             message: "user created successfuly",
             result
         };
     } catch (error) {
-        return { error }
+        return {
+            statusCode: 400,
+            status: error.message,
+            error
+        }
     }
 
 }
@@ -43,11 +49,15 @@ async function LogIn(email, password) {
 
         if (value) {
             return {
+                statusCode: 200,
+                status: "success",
                 message: "logged in successfuly",
                 user
             }
         } else {
             return {
+                statusCode: 400,
+                status: "error",
                 message: "incorrect password"
             }
         }
@@ -60,11 +70,15 @@ async function FindUser(userId) {
 
     if (user) {
         return {
+            statusCode: 200,
+            status: "success",
             message: "userFound",
             user
         };
     } else {
         return {
+            statusCode: 404,
+            status: "error",
             message: "userNot Found"
         }
     }
@@ -86,10 +100,40 @@ async function UpdateInfo(userId, info) {
         user.picture = info.picture;
     }
 
-    const result = await user.save();
+    try {
+        const result = await user.save();
+        return {
+            statusCode: 200,
+            status: "success",
+            message: "info updated",
+            result
+        }
+    } catch (error) {
+        return {
+            statusCode: 400,
+            status: "error",
+            message: "info not updated",
+            error
+        }
+    }
 
-    return {
-        message: "info updated",
+}
+
+async function DeleteUser(userId) {
+    const user = await User.findOneAndDelete({ userId });
+
+    if (user) {
+        return {
+            statusCode: 200,
+            status: "success",
+            message: "user deleted successfuly",
+        }
+    } else {
+        return {
+            statusCode: 404,
+            status: "error",
+            message: "user not found"
+        }
     }
 }
 
@@ -98,6 +142,5 @@ module.exports = {
     LogIn,
     UpdateInfo,
     FindUser,
+    DeleteUser
 }
-
-///TODO Fix bug cast error for balance
