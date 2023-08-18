@@ -45,8 +45,6 @@ userRoute.post("/create", validateInput, async (req, res) => {
 userRoute.post("/login", validateInput, async (req, res) => {
     const { email, password } = req.body;
 
-    console.log(req.headers);
-
     const response = await LogIn(email, password);
 
     const userId = response?.user?.userId;

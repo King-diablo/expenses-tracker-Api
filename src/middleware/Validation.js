@@ -56,8 +56,6 @@ async function Authorzie(req, res, next) {
 
     const token = req.headers.authorization.split(" ")[1];
 
-    console.log(token);
-
     try {
         const decoded = jwt.verify(token, process.env.SECRET_KEY)
 
@@ -72,8 +70,6 @@ async function Authorzie(req, res, next) {
             message: "invalid token"
         });
     }
-
-    console.log(req.headers);
 }
 
 module.exports = {
