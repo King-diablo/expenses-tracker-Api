@@ -119,6 +119,55 @@ async function UpdateInfo(userId, info) {
 
 }
 
+async function CreateTransactionCatogery(userId, title) {
+    const user = await User.findOne({ userId });
+
+    let TransactionCategory = user.TransactionCategory;
+
+    const categories = TransactionCategory.filter((category) => {
+        return category === title;
+    });
+
+    if (categories.length > 0) {
+        return {
+            statusCode: 400,
+            status: "error",
+            message: "title already exist"
+        }
+    }
+
+    TransactionCategory.push(title);
+
+    try {
+        const result = await User.updateOne({ userId }, { TransactionCategory });
+
+        return {
+            statusCode: 200,
+            status: "success",
+            message: "category created successfuly",
+            statusInfo: result
+        }
+    } catch (error) {
+        return {
+            statusCode: 200,
+            status: error.message,
+            message: error,
+        }
+    }
+}
+
+async function FetchTransactionCatogries(userId) {
+    const user = await User.findOne({ userId });
+
+    const TransactionCategory = user.TransactionCategory;
+
+    return {
+        statusCode: 200,
+        status: "success",
+        TransactionCategory
+    }
+}
+
 async function DeleteUser(userId) {
     const user = await User.findOneAndDelete({ userId });
 
@@ -141,6 +190,8 @@ module.exports = {
     CreateUser,
     LogIn,
     UpdateInfo,
+    CreateTransactionCatogery,
+    FetchTransactionCatogries,
     FindUser,
-    DeleteUser
+    DeleteUser,
 }

@@ -126,9 +126,47 @@ a token is required to access the route
 
 Authorization: Bearer "token"
 ```
-> * Fetch/:transactionType (Get A Specific Transaction)
+> * createCategory (Create A Category)
 ```
-https:localhost:3000/api/user/transaction/fetch/:credit||debit
+https:localhost:3000/api/user/createCategory
+
+METHOD: POST
+
+body parameter
+{
+   title *
+}
+
+a token is required to access the route
+
+Authorization: Bearer "token"
+```
+
+> * fetchCategories (Get All Categories)
+```
+https:localhost:3000/api/user/fetchCategories
+
+METHOD: GET
+
+a token is required to access the route
+
+Authorization: Bearer "token"
+```
+
+> * Fetch/transactionType/:type (Get A Specific Transaction)
+```
+https:localhost:3000/api/user/transaction/fetch/transactionType/:credit||debit
+
+METHOD: GET
+
+a token is required to access the route
+
+Authorization: Bearer "token"
+```
+
+> * Fetch/transactionCategory/:category (Get  Specific Transactions By Category)
+```
+https:localhost:3000/api/user/transaction/fetch/transactionCategory/:category
 
 METHOD: GET
 

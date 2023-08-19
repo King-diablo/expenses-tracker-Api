@@ -14,9 +14,6 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    name: String,
-    Gender: String,
-    picture: String,
     balance: {
         type: Number,
         default: 0,
@@ -24,7 +21,14 @@ const UserSchema = new mongoose.Schema({
     Transactions: {
         type: Array,
         default: []
-    }
+    },
+    TransactionCategory: {
+        type: Array,
+        default: ["lifestyle", "entertainment", "investment", "default"]
+    },
+    name: String,
+    Gender: String,
+    picture: String,
 })
 
 

@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 var jwt = require('jsonwebtoken');
 
-const { CreateUser, UpdateInfo, LogIn, DeleteUser } = require("../controller/UserController");
+const { CreateUser, UpdateInfo, LogIn, DeleteUser, CreateTransactionCatogery, FetchTransactionCatogries } = require("../controller/UserController");
 const { Authorzie, validateInput, validateUpdatedInput } = require("../middleware/Validation");
 const { Payload } = require("../helper/Helpers");
 const { transactionRoute } = require("./TransactionRoute");
@@ -58,7 +58,7 @@ userRoute.post("/login", validateInput, async (req, res) => {
     }
 
     res.status(response.statusCode).json({ newResponse, token });
-})
+});
 
 userRoute.post("/update", Authorzie, validateUpdatedInput, async (req, res) => {
     const { name, Gender, picture } = req.body;
@@ -75,6 +75,25 @@ userRoute.post("/update", Authorzie, validateUpdatedInput, async (req, res) => {
     res.status(result.statusCode).json({
         result
     })
+});
+
+userRoute.post("/createCategory", Authorzie, async (req, res) => {
+    const { userId } = req.user;
+
+    const { title } = req.body;
+
+    const result = await CreateTransactionCatogery(userId, title.toLowerCase());
+
+    res.status(result.statusCode).json(result);
+});
+
+userRoute.get("/fetchCategories", Authorzie, async (req, res) => {
+
+    const { userId } = req.user;
+
+    const response = await FetchTransactionCatogries(userId);
+
+    res.status(response.statusCode).json(response);
 })
 
 userRoute.delete("/delete", Authorzie, async (req, res) => {
@@ -83,7 +102,7 @@ userRoute.delete("/delete", Authorzie, async (req, res) => {
     const response = await DeleteUser(user.userId);
 
     res.status(response.statusCode).json({ response });
-})
+});
 
 userRoute.use("/transaction", transactionRoute);
 
@@ -91,3 +110,8 @@ userRoute.use("/transaction", transactionRoute);
 module.exports = {
     userRoute,
 }
+
+///TODO add catogeries to transaction
+///TODO filiter by catogeries
+///TODO add custom credit or debit (future or past transactions)
+///TODO create custom category
